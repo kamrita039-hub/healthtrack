@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Family Members{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Family Members</h1>
+            <p class="page-subtitle">Manage health profiles for each family member</p>
+        </div>
+        <a href="{% url 'member_add' %}" class="btn btn-primary">+ Add Member</a>
+    </div>
+
+    {% if members %}
+    <div class="grid-3">
+        {% for member in members %}
+        <div class="card" style="cursor: pointer;" onclick="window.location='{% url 'member_detail' member.pk %}'">
+            <div style="text-align: center; padding: 1rem 0 0.5rem;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">
+                    {% if member.relation == 'self' %}🧑
+                    {% elif member.relation == 'father' %}👨
+                    {% elif member.relation == 'mother' %}👩
+                    {% elif member.relation == 'son' or member.relation == 'brother' %}👦
+                    {% elif member.relation == 'daughter' or member.relation == 'sister' %}👧
+                    {% elif member.relation == 'spouse' %}💑
+                    {% elif member.relation == 'grandfather' %}👴
+                    {% elif member.relation == 'grandmother' %}👵
+                    {% else %}🧑{% endif %}
+                </div>
+                <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem;">{{ member.name }}</div>
+                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.25rem;">{{ member.get_relation_display }}</div>
+                {% if member.age %}<div style="color: var(--text-dim); font-size: 0.82rem;">Age {{ member.age }}</div>{% endif %}
+            </div>
+            <hr class="divider">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">🩸 {{ member.blood_group }}</span>
+                </div>
+                <span style="font-size: 0.82rem; color: var(--text-muted);">📋 {{ member.record_count }} record{{ member.record_count|pluralize }}</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                <a href="{% url 'member_detail' member.pk %}" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;" onclick="event.stopPropagation()">View</a>
+                <a href="{% url 'member_edit' member.pk %}" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">✏️</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-icon">👨‍👩‍👧</div>
+            <div class="empty-title">No family members added yet</div>
+            <div class="empty-subtitle" style="margin-bottom: 1.5rem;">Start by adding yourself or a family member</div>
+            <a href="{% url 'member_add' %}" class="btn btn-primary">+ Add First Member</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

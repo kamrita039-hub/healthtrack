@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Delete Record{% endblock %}
+
+{% block content %}
+<div class="main-content" style="max-width: 500px;">
+    <div class="card" style="border-color: rgba(255,107,107,0.3); text-align: center; padding: 3rem 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
+        <h2 style="font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 0.75rem;">Delete this record?</h2>
+        <p style="color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; font-size: 1.05rem;">{{ record.title }}</p>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">
+            for {{ record.family_member.name }} · diagnosed {{ record.diagnosis_date }}
+        </p>
+        <form method="post" style="display: flex; gap: 1rem; justify-content: center;">
+            {% csrf_token %}
+            <a href="{% url 'member_detail' record.family_member.pk %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Delete Record</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

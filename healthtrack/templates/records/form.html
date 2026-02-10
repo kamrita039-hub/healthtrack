@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Health Record{% endblock %}
+
+{% block content %}
+<div class="main-content" style="max-width: 750px;">
+    <div style="margin-bottom: 1.5rem;">
+        <a href="{% url 'member_detail' member.pk %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to {{ member.name }}</a>
+    </div>
+    <h1 class="page-title" style="margin-bottom: 0.4rem;">{{ action }} Health Record</h1>
+    <p class="page-subtitle" style="margin-bottom: 2rem;">
+        {% if action == 'Add' %}Recording a health event for <strong style="color:var(--text);">{{ member.name }}</strong>{% else %}Editing record for {{ member.name }}{% endif %}
+    </p>
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">Condition / Title *</label>
+                <input type="text" name="title" class="form-control"
+                    value="{{ form.title.value|default:'' }}"
+                    placeholder="e.g. Type 2 Diabetes, Appendix Surgery, Penicillin Allergy" required>
+                {% if form.title.errors %}<div class="form-error">{{ form.title.errors|join:", " }}</div>{% endif %}
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select name="category" class="form-control" required>
+                        {% for value, label in form.fields.category.choices %}
+                        <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Severity *</label>
+                    <select name="severity" class="form-control" required>
+                        {% for value, label in form.fields.severity.choices %}
+                        <option value="{{ value }}" {% if form.severity.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Status *</label>
+                    <select name="status" class="form-control" required>
+                        {% for value, label in form.fields.status.choices %}
+                        <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Diagnosis Date *</label>
+                    <input type="date" name="diagnosis_date" class="form-control"
+                        value="{{ form.diagnosis_date.value|default:'' }}" required>
+                    {% if form.diagnosis_date.errors %}<div class="form-error">{{ form.diagnosis_date.errors|join:", " }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Recovery Date (if applicable)</label>
+                    <input type="date" name="recovery_date" class="form-control"
+                        value="{{ form.recovery_date.value|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Doctor's Name</label>
+                    <input type="text" name="doctor_name" class="form-control"
+                        value="{{ form.doctor_name.value|default:'' }}"
+                        placeholder="e.g. Dr. Anil Kumar">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hospital / Clinic</label>
+                <input type="text" name="hospital" class="form-control"
+                    value="{{ form.hospital.value|default:'' }}"
+                    placeholder="e.g. AIIMS Delhi, Apollo Hospital">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description / Notes</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="Describe symptoms, treatment details, test results...">{{ form.description.value|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">💊 Medications (comma separated)</label>
+                <textarea name="medications" class="form-control" rows="2"
+                    placeholder="e.g. Metformin 500mg twice daily, Aspirin 75mg once daily">{{ form.medications.value|default:'' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                <a href="{% url 'member_detail' member.pk %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ action }} Record →</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

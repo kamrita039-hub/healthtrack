@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}{{ member.name }}{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- HEADER -->
+    <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="{% url 'member_list' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back</a>
+            <div>
+                <h1 class="page-title">{{ member.name }}</h1>
+                <p class="page-subtitle">{{ member.get_relation_display }}{% if member.age %} · Age {{ member.age }}{% endif %} · 🩸 {{ member.blood_group }}</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="{% url 'record_add' member.pk %}" class="btn btn-primary">+ Add Health Record</a>
+            <a href="{% url 'member_edit' member.pk %}" class="btn btn-secondary">✏️ Edit</a>
+            <a href="{% url 'member_delete' member.pk %}" class="btn btn-danger btn-sm">🗑 Delete</a>
+        </div>
+    </div>
+
+    <!-- SUMMARY STATS -->
+    <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem;">
+        <div class="stat-card teal">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value">{{ records.count }}</div>
+            <div class="stat-label">Total Records</div>
+        </div>
+        <div class="stat-card coral">
+            <div class="stat-icon">🔴</div>
+            <div class="stat-value">{{ active.count }}</div>
+            <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon">🔄</div>
+            <div class="stat-value">{{ chronic.count }}</div>
+            <div class="stat-label">Chronic</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value">{{ recovered.count }}</div>
+            <div class="stat-label">Recovered</div>
+        </div>
+    </div>
+
+    {% if member.notes %}
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 3px solid var(--teal);">
+        <div style="font-size: 0.8rem; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">📝 Notes</div>
+        <div style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">{{ member.notes }}</div>
+    </div>
+    {% endif %}
+
+    <!-- HEALTH RECORDS TABLE -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🩺 Health Records</span>
+            <a href="{% url 'record_add' member.pk %}" class="btn btn-primary btn-sm">+ Add Record</a>
+        </div>
+
+        {% if records %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Condition / Title</th>
+                    <th>Category</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Diagnosed</th>
+                    <th>Doctor</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>
+                        <div style="font-weight: 600; font-size: 0.9rem;">{{ record.title }}</div>
+                        {% if record.hospital %}<div style="font-size: 0.8rem; color: var(--text-muted);">🏥 {{ record.hospital }}</div>{% endif %}
+                    </td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">{{ record.get_category_display }}</td>
+                    <td><span class="badge badge-{{ record.severity }}">{{ record.get_severity_display }}</span></td>
+                    <td><span class="badge badge-{{ record.status }}">{{ record.get_status_display }}</span></td>
+                    <td style="font-size: 0.85rem;">{{ record.diagnosis_date }}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">{{ record.doctor_name|default:"—" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <a href="{% url 'record_edit' record.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="{% url 'record_delete' record.pk %}" class="btn btn-danger btn-sm">Del</a>
+                        </div>
+                    </td>
+                </tr>
+                {% if record.description %}
+                <tr>
+                    <td colspan="7" style="padding-top: 0; padding-bottom: 0.5rem;">
+                        <div style="background: var(--surface2); border-radius: 6px; padding: 0.6rem 0.8rem; font-size: 0.82rem; color: var(--text-muted);">
+                            📝 {{ record.description }}
+                            {% if record.medications %}<br><strong style="color: var(--amber);">💊 Medications:</strong> {{ record.medications }}{% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🩺</div>
+            <div class="empty-title">No health records yet</div>
+            <div class="empty-subtitle" style="margin-bottom: 1rem;">Add diseases, surgeries, allergies or any health events</div>
+            <a href="{% url 'record_add' member.pk %}" class="btn btn-primary">+ Add First Record</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

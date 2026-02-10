@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Good day, {{ user.first_name|default:user.username }} 👋</h1>
+            <p class="page-subtitle">Here's your family health overview</p>
+        </div>
+        <a href="{% url 'member_add' %}" class="btn btn-primary">+ Add Family Member</a>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon">👨‍👩‍👧</div>
+            <div class="stat-value">{{ member_count }}</div>
+            <div class="stat-label">Family Members</div>
+        </div>
+        <div class="stat-card teal">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value">{{ total_records }}</div>
+            <div class="stat-label">Total Records</div>
+        </div>
+        <div class="stat-card coral">
+            <div class="stat-icon">🔴</div>
+            <div class="stat-value">{{ active_records }}</div>
+            <div class="stat-label">Active Conditions</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon">🔄</div>
+            <div class="stat-value">{{ chronic_records }}</div>
+            <div class="stat-label">Chronic Conditions</div>
+        </div>
+    </div>
+
+    <div class="grid-2" style="align-items: start;">
+        <!-- FAMILY MEMBERS -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">👨‍👩‍👧 Family Members</span>
+                <a href="{% url 'member_list' %}" class="btn btn-secondary btn-sm">View All</a>
+            </div>
+            {% if members %}
+                {% for member in members %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid rgba(48,54,61,0.5);">
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 0.2rem;">{{ member.name }}</div>
+                        <div style="color: var(--text-muted); font-size: 0.82rem;">
+                            {{ member.get_relation_display }}
+                            {% if member.age %} · {{ member.age }} yrs{% endif %}
+                            · 🩺 {{ member.record_count }} record{{ member.record_count|pluralize }}
+                        </div>
+                    </div>
+                    <a href="{% url 'member_detail' member.pk %}" class="btn btn-secondary btn-sm">View</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state" style="padding: 2rem;">
+                    <div class="empty-icon">👨‍👩‍👧</div>
+                    <div class="empty-title">No family members yet</div>
+                    <div class="empty-subtitle" style="margin-bottom: 1rem;">Add yourself or a family member to get started</div>
+                    <a href="{% url 'member_add' %}" class="btn btn-primary btn-sm">+ Add First Member</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- RECENT RECORDS -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">🕐 Recent Records</span>
+            </div>
+            {% if recent_records %}
+                {% for record in recent_records %}
+                <div style="padding: 0.85rem 0; border-bottom: 1px solid rgba(48,54,61,0.5);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.3rem;">
+                        <div style="font-weight: 600; font-size: 0.9rem;">{{ record.title }}</div>
+                        <span class="badge badge-{{ record.status }}">{{ record.get_status_display }}</span>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.82rem;">
+                        {{ record.family_member.name }} · {{ record.get_category_display }} · {{ record.diagnosis_date }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state" style="padding: 2rem;">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-title">No health records yet</div>
+                    <div class="empty-subtitle">Add a family member first, then start adding records</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
